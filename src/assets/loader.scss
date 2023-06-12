@@ -1,0 +1,49 @@
+.loader {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+  
+    &::after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #007bff;
+        border-color: #007bff transparent #007bff transparent;
+        animation: loader--spinner 1.2s linear infinite;
+    }
+
+    &.loader-sm {
+        width: 20px !important;
+        height: 20px !important;
+
+        &::after {
+            width: 20px !important;
+            height: 20px !important;
+            border-width: 3px;
+            
+        }
+    }
+
+    &.loader-md {
+        width: 48px;
+        height: 48px;
+
+        &::after {
+            width: 48px;
+            height: 48px;
+            border-width: 3px;
+        }
+    }
+}
+@keyframes loader--spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+  

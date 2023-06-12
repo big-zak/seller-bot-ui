@@ -1,0 +1,33 @@
+
+@import "./loader.scss";
+
+.center-items-vh {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.full-width { width: 100%; }
+.full-height { height: 100%; }
+.icon-sm { width: 18px; height: 18px; }
+
+.swal2-html-container, .loading-modal {
+    overflow-y: hidden  !important;
+}
+
+
+.img-xs { width: 24px; height: 24px;}
+
+.img-sm { width: 32px; height: 32px;}
+
+.img-md { width: 64px; height: 64px; }
+
+.icon-xs { width: 16px; height: 16px; }
+
+.icon-sm { width: 20px; height: 20px; font-size: 20px; }
+
+.hidden { display: none;}
+
+.swal2-container {
+    z-index: 999999999 !important;
+}
