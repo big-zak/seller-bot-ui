@@ -3,6 +3,7 @@
 import Http from "@/classes/Http"
 import Utils from "@/classes/Utils"
 import LoadingView from "@/layouts/LoadingView.vue"
+import TargetPriceCalc from "./TargetPriceCalc.vue"
 import { onBeforeMount } from "vue"
 import { watch } from "vue"
 import { ref, onUpdated, onMounted } from "vue"
@@ -14,24 +15,27 @@ const props = defineProps({
 
 const $emits = defineEmits(["close", "save"])
 
-const dialogOpened = ref(props.isOpened)
-const formData = ref({
+const defaultForm = {
     _id: "",
     tokenAddressA:  "",
     tokenAddressB:  "",
-    quantity:       0.0,
+    quantity:       "0.0",
     orderType:      "sell",
-    targetPrice:    0.0,
+    targetPrice:    "0.0",
     exchangeId:     "",
     slippage:       0.5,
     isActive:       true,
     supportsFeeOnTransfer: false
-})
+}
+
+const dialogOpened = ref(props.isOpened)
+const formData = ref(defaultForm)
 
 const exchangesArray = ref([])
 const isLoading      = ref(false)
 const isInitialing   = ref(false)
 const initError      = ref("")
+const isTargetPriceDialogOpened = ref(false)
 
 onMounted(()=> {
     initialize()
@@ -124,11 +128,11 @@ const submit = async () => {
             return Utils.notyError("Invalid order type")
         }
 
-        if(fData.targetPrice <= 0){
+        if(parseFloat(fData.targetPrice) <= 0){
             return Utils.notyError("Target price must exceed 0")
         }
 
-        if(fData.quantity <= 0){
+        if(parseFloat(fData.quantity) <= 0){
             return Utils.notyError("Quantity of tokenA to sell must exceed 0")
         }
 
@@ -160,7 +164,21 @@ const submit = async () => {
     }
 }
 
+const handleNumberInput = e => {
+    //console.log(e.target.value)
+    if(e.key == "."){
+        if(e.target.value.includes(".")){
+            e.preventDefault()
+        }
+    } else if(!/([0-9]+)/g.test(e.key)) {
+        e.preventDefault()
+    } 
+}
 
+const onTargetPriceSave = (value) => {
+    formData.value.targetPrice = value.toString()
+    isTargetPriceDialogOpened.value = false
+}
 </script>
 
 <template>
@@ -217,21 +235,30 @@ const submit = async () => {
                             ></v-select>
                         </div>
                         <div class="my-5">
+                            <v-select
+                                v-model="formData.exchangeId"
+                                :items="exchangesArray"
+                                label="Select Exchange"
+                                density="comfortable"
+                                item-title="nameWithChain"
+                                item-value="_id"
+                            ></v-select>
+                        </div>
+                        <div class="my-5">
                             <v-text-field
-                                v-model="formData.targetPrice"
-                                label="Target Price"
+                                v-model="formData.tokenA"
+                                label="TokenA (token to sell contract)"
                                 required
-                                type="number"
                             ></v-text-field>
                         </div>
                         <div class="my-5">
                             <v-text-field
-                                v-model="formData.quantity"
-                                label="TokenA quantity to sell"
+                                v-model="formData.tokenB"
+                                label="TokenB (token to buy contract)"
                                 required
-                                type="number"
                             ></v-text-field>
                         </div>
+
                         <div class="my-5">
                             <v-slider
                                 v-model="formData.slippage"
@@ -243,16 +270,16 @@ const submit = async () => {
                                 hide-details
                             >
                                 <template v-slot:append>
-                                <v-text-field
-                                    v-model="formData.slippage"
-                                    hide-details
-                                    single-line
-                                    density="compact"
-                                    :min="0"
-                                    :max="100"
-                                    type="number"
-                                    style="width: 80px"
-                                ></v-text-field>
+                                    <v-text-field
+                                        v-model="formData.slippage"
+                                        hide-details
+                                        single-line
+                                        density="compact"
+                                        :min="0"
+                                        :max="100"
+                                        type="number"
+                                        style="width: 80px"
+                                    ></v-text-field>
                                 </template>
                             </v-slider>
                         </div>
@@ -264,31 +291,35 @@ const submit = async () => {
                                 hide-details
                             ></v-checkbox>
                         </div>
+            
+                        <div class="my-5">
+                            <div class="d-flex">
+                                <v-text-field
+                                    v-model="formData.targetPrice"
+                                    label="Target Price"
+                                    required
+                                    type="text"
+                                    pattern="[0-9\.]+"
+                                    @keypress="handleNumberInput"
+                                ></v-text-field>
+                                <div class="ps-2">
+                                    <v-btn 
+                                        icon="mdi-calculator" 
+                                        size="small"
+                                        @click.prevent="isTargetPriceDialogOpened = true" 
+                                    />
+                                </div>
+                            </div>
+                        </div>
                         <div class="my-5">
                             <v-text-field
-                                v-model="formData.tokenA"
-                                label="TokenA (token to sell contract)"
+                                v-model="formData.quantity"
+                                label="TokenA quantity to sell"
                                 required
+                                type="text"
+                                pattern="[0-9\.]+"
+                                @keypress="handleNumberInput"
                             ></v-text-field>
-                        </div>
-
-                        <div class="my-5">
-                            <v-text-field
-                                v-model="formData.tokenB"
-                                label="TokenB (token to buy contract)"
-                                required
-                            ></v-text-field>
-                        </div>
-                    
-                        <div class="my-5">
-                            <v-select
-                                v-model="formData.exchangeId"
-                                :items="exchangesArray"
-                                label="Select Exchange"
-                                density="comfortable"
-                                item-title="nameWithChain"
-                                item-value="_id"
-                            ></v-select>
                         </div>
                         <div>
                             <v-checkbox
@@ -328,5 +359,11 @@ const submit = async () => {
                 </loading-view>
             </v-card-text>
         </v-card>
+        <TargetPriceCalc
+            :isOpened="isTargetPriceDialogOpened"
+            @close="isTargetPriceDialogOpened = false"
+            :data="formData"
+            @save="onTargetPriceSave"
+        />
     </v-dialog>
 </template>

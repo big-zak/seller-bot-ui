@@ -27,7 +27,7 @@
     "datatables.net-select": "^1.6.2",
     "datatables.net-vue3": "^2.1.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "ethers": "^5.7.0",
+    "ethers": "^6.6.0",
     "from-exponential": "^1.1.1",
     "jwt-decode": "3.1.2",
     "pinia": "2.0.35",

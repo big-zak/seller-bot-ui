@@ -32,16 +32,20 @@ export default class Http {
      */
     static async requestApi( method, uri, data={}, requiresAuth = false){
 
+        uri = uri.replace(/^(\/+)/, "")
+
+       // console.log("uri===>", uri)
                 
         let headers = {"x-key": appConfig.apiKey}
        
-        if(uri != "/login" || uri != '/validate-auth'){
+        if(!/^(login|validate\-auth)/i.test(uri)){
             
+            //console.log("not auth uri")
             let authInfoStr = (window.sessionStorage.getItem("auth_info") || "").trim()
 
             if(authInfoStr == ""){
                 Utils.notyError("Login Required")
-                window.location = "/login"
+                 window.location = "/login"
                 return Status.error("login_required") 
             }
 
@@ -64,7 +68,7 @@ export default class Http {
         let apiEndpoint = appConfig.apiEndpoint
                             .replace(/(\/+)$/, "")
 
-        uri = uri.replace(/^(\/+)/, "")
+       // console.log("apiEndpoint===>", apiEndpoint)
 
         let url = `${apiEndpoint}/${uri}`;
 

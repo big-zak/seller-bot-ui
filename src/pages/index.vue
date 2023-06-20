@@ -19,6 +19,7 @@ const isLoading = ref(false)
 const isDialogOpened = ref(false)
 const dataToEdit = ref({})
 const uikey = ref(Date.now())
+const dialogKey = ref(Date.now)
 
 onMounted(()=>{
   fetchData()
@@ -34,6 +35,7 @@ onMounted(()=>{
 const openDialog = () => {
   dataToEdit.value = {}
   isDialogOpened.value = true
+  dialogKey.value = ref(Date.now)
 }
 
 const handleOnSave = async () => {
@@ -275,7 +277,10 @@ const deleteItem = async (item) => {
       :data="dataToEdit"
       @close="onDialogClosed"
       @save="handleOnSave"
+      :key="dialogKey"
     /> 
+
+
   </div>
 </template>
 <style lang="scss">
