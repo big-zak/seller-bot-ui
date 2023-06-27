@@ -91,9 +91,9 @@ const getCurrentPrice =  item => {
   }
 
   //console.log("priceInfo===>", priceInfo)
-  let price = fromExponential(priceInfo.priceDecimal.$numberDecimal)
+  //let price = priceInfo.priceDecimal
 
-  return `${price} ${item.tokenBInfo.symbol}`
+  return `${priceInfo.priceDecimal} ${item.tokenBInfo.symbol}`
 }
 
 const getStatus = item => {
